@@ -1,1 +1,4 @@
 rootkey.csv
+credentials*.csv
+credentials.md
+*.pem

@@ -43,13 +43,102 @@ aws --version
 ```
 
 3. Configure AWS Access
-    - https://console.aws.amazon.com/iam/home?region=us-east-2#/security_credentials
-    - Access Keys
 
+Create access keys: https://console.aws.amazon.com/iam/home?region=us-east-2#/security_credentials
+
+```bash
+$ aws configure
+AWS Access Key ID [None]: <>
+AWS Secret Access Key [None]: <>
+Default region name [None]: us-east-2
+Default output format [None]: json
+
+$ aws ec2 describe-instances
+{
+    "Reservations": []
+}
+```
+
+## Set up cloud administration
+
+1. set up alarms with (CloudWatch)
+    - go to sns dashboard
+    - switch to us-east-1 (billing alerts only available here)
+    - check `Receive PDF Invoice By Email` and `Receive Billing Alerts` in billing pref
+    - > cloud watch
+
+2. configuring and managing users (IAM)
+    - create non-root user
+    - use aws cli to re-configure credentials
+    - delete root access key
+    - create admin group
+    - create password policy
+    - set up sign in credentials for user
+    - login as IAM user: https://<>.signin.aws.amazon.com/console
+    
 ## Pizza Project
+
+### Services
 
 EC2 - run application
 DynamoDB - stores users
 RDS - stores pizzas
 Elastic Cache - cache layer to save memory
 S3 - stores images
+
+### Set Up
+
+- Create VPC
+- create 2 subnets against different availability zones
+- for 2nd subnet, set non-conflicting CIDR (e.g. 10.0.0.0/24 vs 10.0.1.0/24)
+- add 0.0.0.0/0 route rules for both subnets
+- Create EC2 instance
+- add VPC
+- add SG with custom TCP with port 3000 from anywhere
+- ceate ssh key pair
+
+### Deployment
+
+## EC2
+- compute vs storage optimized
+- EBS volumes exists independently from EC2 instances
+
+## VPC
+
+### Security Groups
+- shared among instances
+- EC2 instances can give access to security groups instead of individual EC2 instances
+
+### Routing Table
+- route traffic between VPC and external
+
+### Network ACL
+- each VPC has 1 list
+- applies network access to entire VPC
+- different from sec groups in that NACL uses network rules instead of policies
+
+### Subnet
+- isolated subzone within a VPC
+- allows for granular access control within VPC
+
+## Monitoring
+
+### Cloud Watch
+
+- examples: throughput, billing
+- service > CW > SNS (SMS,Email,HTTP) | Action Trigger
+
+### SNS Topic
+
+- unique resource name which acts as a gateway for routing notifications to SMS/Email
+
+## Security
+
+### IAM Policies
+
+- collection of permissions
+- assign access to groups
+- add users to group
+- can be aws (service-wide) or customer managed 
+
+<Action> <Allow|Deny> <Resource|*>
