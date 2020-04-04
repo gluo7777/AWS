@@ -13,8 +13,8 @@ Industry shifting from on premise to cloud.
 
 - extracting responsibility of application into services
 - 1 service = 1 responsibility
-    - files
-    - caching
+	- files
+	- caching
 - application will handle core business logic
 
 ## Web of AWS
@@ -55,27 +55,27 @@ Default output format [None]: json
 
 $ aws ec2 describe-instances
 {
-    "Reservations": []
+	"Reservations": []
 }
 ```
 
 ## Set up cloud administration
 
 1. set up alarms with (CloudWatch)
-    - go to sns dashboard
-    - switch to us-east-1 (billing alerts only available here)
-    - check `Receive PDF Invoice By Email` and `Receive Billing Alerts` in billing pref
-    - > cloud watch
+	- go to sns dashboard
+	- switch to us-east-1 (billing alerts only available here)
+	- check `Receive PDF Invoice By Email` and `Receive Billing Alerts` in billing pref
+	- > cloud watch
 
 2. configuring and managing users (IAM)
-    - create non-root user
-    - use aws cli to re-configure credentials
-    - delete root access key
-    - create admin group
-    - create password policy
-    - set up sign in credentials for user
-    - login as IAM user: https://<>.signin.aws.amazon.com/console
-    
+	- create non-root user
+	- use aws cli to re-configure credentials
+	- delete root access key
+	- create admin group
+	- create password policy
+	- set up sign in credentials for user
+	- login as IAM user: https://<>.signin.aws.amazon.com/console
+	
 ## Pizza Project
 
 ### Services
@@ -101,8 +101,8 @@ S3 - stores images
 - test ssh connection `ssh -i <pem file> ec2-user@<public-ip>`
 - update packages `sudo yum update`
 - update repositories 
-    - `sudo su`
-    - `curl -sL https://rpm.nodesource.com/setup_12.x | bash -`
+	- `sudo su`
+	- `curl -sL https://rpm.nodesource.com/setup_12.x | bash -`
 
 ### Start app
 - install node
@@ -114,42 +114,42 @@ S3 - stores images
 ### Scaling instance
 - create image from current instance
 - create load balancer to maintain a consistent DNS entry and balances requests to multiple instances
-    - select both availability zones
-    - change target group port to 3000
-    - set up sticky session via target groups (1 day)
+	- select both availability zones
+	- change target group port to 3000
+	- set up sticky session via target groups (1 day)
 - create auto scaling group to control instance pools
-    - launch auto scaling group wizard
-    - start with creating launch configuration
-    - populate launch configuration details with user script to start node application
-    ```bash
-    #!/bin/bash
-    echo "Starting pizza-luvrs web application"
-    cd /home/ec2-user/pizza-luvrs
-    npm start
-    ```
-    - select pizza-ec2-sg
-    - start auto scaling group configuration
-    - select vpc and add both subnets
-    - attach target group to auto scaling group via advanced details
-    - verify 2 instances successfully started
-    - remove 3rd instance if it's somehow still attached
+	- launch auto scaling group wizard
+	- start with creating launch configuration
+	- populate launch configuration details with user script to start node application
+	```bash
+	#!/bin/bash
+	echo "Starting pizza-luvrs web application"
+	cd /home/ec2-user/pizza-luvrs
+	npm start
+	```
+	- select pizza-ec2-sg
+	- start auto scaling group configuration
+	- select vpc and add both subnets
+	- attach target group to auto scaling group via advanced details
+	- verify 2 instances successfully started
+	- remove 3rd instance if it's somehow still attached
 - open load balancer dns name url in browser
 - summary: load balancer > auto scaling group > pool > instance
 
 ### Enhance security
 - modify ec2 group
-    - keep ssh access if you need to do more set up
-    - delete ipv6 rule
-    - modify inbound tcp to only allow requests from load balancer (type `s` to auto-complete with resource name of LB)
-        - using name b/c LB IP can dynamically change
+	- keep ssh access if you need to do more set up
+	- delete ipv6 rule
+	- modify inbound tcp to only allow requests from load balancer (type `s` to auto-complete with resource name of LB)
+		- using name b/c LB IP can dynamically change
 
 ### Add auto scaling rules
 - create simple scaling policy for scaling up
-    - create alarm using network out
-        - try something above baseline (for easy testing use 10KB)
-        - change action to add 1
+	- create alarm using network out
+		- try something above baseline (for easy testing use 10KB)
+		- change action to add 1
 - create simple scaling policy for scaling **down**
-    - change action to remove 1
+	- change action to remove 1
 - change maximum instances to 4
 
 ### Test auto scaling
@@ -247,4 +247,14 @@ S3 - stores images
 - create image store js file for S3 at `lib/imageStoreS3.js`
 - modify `lib/imageStore.js` to use `imageStoreS3`
 
-## Configure S3 for CORS
+## Configure S3 Bucket for CORS
+- Allow GET for all origins with max age of 3K seconds
+```xml
+<CORSConfiguration>
+	<CORSRule>
+		<AllowedOrigin>*</AllowedOrigin>
+		<AllowedMethods>GET</AllowedMethods>
+		<MaxAgeSeconds>3000</MaxAgeSeconds>
+	</CORSRule>
+</CORSConfiguration>
+```
