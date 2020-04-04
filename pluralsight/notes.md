@@ -96,6 +96,66 @@ S3 - stores images
 - add VPC
 - add SG with custom TCP with port 3000 from anywhere
 - ceate ssh key pair
+- allocate elastic ip from amazon's pool
+- repeat and assign to each ec2 instance
+- test ssh connection `ssh -i <pem file> ec2-user@<public-ip>`
+- update packages `sudo yum update`
+- update repositories 
+    - `sudo su`
+    - `curl -sL https://rpm.nodesource.com/setup_12.x | bash -`
+
+### Start app
+- install node
+- copy source code to instance `scp -r -i <pem file> ./pizza-luvrs ec2-user@<public-ip>:/home/ec2-user/pizza-luvrs`
+- `npm install`
+- `npm start`
+- navigate to `<public-ip>:3000` in browser
+
+### Scaling instance
+- create image from current instance
+- create load balancer to maintain a consistent DNS entry and balances requests to multiple instances
+    - select both availability zones
+    - change target group port to 3000
+    - set up sticky session via target groups (1 day)
+- create auto scaling group to control instance pools
+    - launch auto scaling group wizard
+    - start with creating launch configuration
+    - populate launch configuration details with user script to start node application
+    ```bash
+    #!/bin/bash
+    echo "Starting pizza-luvrs web application"
+    cd /home/ec2-user/pizza-luvrs
+    npm start
+    ```
+    - select pizza-ec2-sg
+    - start auto scaling group configuration
+    - select vpc and add both subnets
+    - attach target group to auto scaling group via advanced details
+    - verify 2 instances successfully started
+    - remove 3rd instance if it's somehow still attached
+- open load balancer dns name url in browser
+- summary: load balancer > auto scaling group > pool > instance
+
+### Enhance security
+- modify ec2 group
+    - keep ssh access if you need to do more set up
+    - delete ipv6 rule
+    - modify inbound tcp to only allow requests from load balancer (type `s` to auto-complete with resource name of LB)
+        - using name b/c LB IP can dynamically change
+
+### Add auto scaling rules
+- create simple scaling policy for scaling up
+    - create alarm using network out
+        - try something above baseline (for easy testing use 10KB)
+        - change action to add 1
+- create simple scaling policy for scaling **down**
+    - change action to remove 1
+- change maximum instances to 4
+
+### Test auto scaling
+- Use JMeter/Apache Benchmark
+- wait 5 minutes then check activity history to confirm that new instances are created
+- wait another 5 minutes to check that instances have scaled back down to 2
 
 ### Deployment
 
@@ -142,3 +202,49 @@ S3 - stores images
 - can be aws (service-wide) or customer managed 
 
 <Action> <Allow|Deny> <Resource|*>
+
+## S3
+
+- can target specific region for storage
+- Bucket
+	- unique name
+	- Object
+		- File
+		- Metadata
+		- Key: path/filename
+	- Control access with bucket policies and/or IAM ACL
+- URL: `<bucket>.s3.<region>.amazonaws.com/<path>`
+- cross region replication can reduce latenacy and increase redundancy (2 regions)
+	- CloudFront is better suited when more than 2 regions
+- Use AWS Policy Generator to create a bucket policy
+
+## Setting up S3
+
+- launch s3 create bucket configuration
+- wizard will show buckets in all regions
+- For testing, unblock public access
+- Go to [AWS Policy Generator](https://awspolicygen.s3.amazonaws.com/policygen.html)
+- Select s3 bucket policy
+- Allow * | Action GetObject (allows downloading image/view files in browser)
+- create ARN with `<bucket-name>/*` suffix so policy applies to all files in bucket
+- paste generated json in permission/bucket policy
+
+## Upload to S3
+
+- upload static resources (images, css) to S3
+- CLI: `aws s3 cp <local folder> s3://<bucket>/<remote folder> --recursive --exclude <pattern>`
+- upload assets/js to js | exclude .DS_Store
+- upload assets/css to css | exclude .DS_Store
+- upload assets/pizzas to pizzas | exclude .DS_Store
+- verify all 3 folders uploaded
+- test bucket policy by opening the resources directly in browser
+- upload toppings via file upload wizard
+- upload assets/*.png via file upload wizard
+- change root assets url references `/assets` to `<bucket url>` in project hbs files. leave out protocol
+- make same change in js files
+- re-upload js files
+- make same change in mock_pizzas folder
+- create image store js file for S3 at `lib/imageStoreS3.js`
+- modify `lib/imageStore.js` to use `imageStoreS3`
+
+## Configure S3 for CORS
