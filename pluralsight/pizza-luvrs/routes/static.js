@@ -1,6 +1,6 @@
 module.exports = handlers => ({
   method: 'GET',
-  path: '/assets/{param*}',
+  path: '//unique-pizza-bucket.s3.us-east-2.amazonaws.com/{param*}',
   handler: {
     directory: {
       path: 'assets'

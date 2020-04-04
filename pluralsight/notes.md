@@ -258,3 +258,4 @@ S3 - stores images
 	</CORSRule>
 </CORSConfiguration>
 ```
+- install
