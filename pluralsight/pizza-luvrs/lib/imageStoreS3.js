@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk')
-const s3 = AWS.S3()
+const s3 = new AWS.S3()
 
 module.exports.save = (name, data) => {
     return new Promise((resolve, reject) => {
@@ -16,7 +16,7 @@ module.exports.save = (name, data) => {
                 reject(error)
             }else{
                 // TODO: replace with actual S3 location
-                resolve(`assets/${params.Key}`)
+                resolve(`//unique-pizza-bucket.s3.us-east-2.amazonaws.com/${params.Key}`)
             }
         })
     })

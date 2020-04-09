@@ -98,6 +98,7 @@ S3 - stores images
 - ceate ssh key pair
 - allocate elastic ip from amazon's pool
 - repeat and assign to each ec2 instance
+- modify pem file permissions: `chmod 400 <pem-file>`
 - test ssh connection `ssh -i <pem file> ec2-user@<public-ip>`
 - update packages `sudo yum update`
 - update repositories 
@@ -253,9 +254,40 @@ S3 - stores images
 <CORSConfiguration>
 	<CORSRule>
 		<AllowedOrigin>*</AllowedOrigin>
-		<AllowedMethods>GET</AllowedMethods>
+		<AllowedMethod>GET</AllowedMethod>
 		<MaxAgeSeconds>3000</MaxAgeSeconds>
 	</CORSRule>
 </CORSConfiguration>
 ```
-- install
+- run application locally to test CORS access
+
+## Accessing S3 within EC2 instance
+
+- use scp to reupload project to EC2. 
+	- make sure to exclude node_modules
+	- `rm -rf node_modules && scp -r -i <pem-file> <folder> ec2-user@<ec2-pub-ip>:/home/ec2-user`
+	- node_modules will not be overwritten in ec2 instance so no need to run npm install again
+- create new image from existing instance `pizza-s3-image`
+- Create new IAM role `pizza-s3-role`
+	- EC2
+	- allow access to S3 `AmazonS3FullAccess`
+- Create new EC2 launch configuration `pizza-s3-launch`
+	- add new role
+	- select assign pub ip to every instance
+	- add start script from last launch configuration
+		- **DON'T FORGET SHEBANG**
+			- if you get a 502 bad gate way, double check user script
+	- add pizza-ec2-sg security group
+	- select existing key pair
+- Modify auto scaling group to use new launch configuration
+	- terminate existing existances
+	- verify that new instances are created under new lanuch configuration
+	- verify ec2 url and login to create new pizza
+
+## Setting up RDS
+
+- 
+
+## Setting up DynamoDB
+
+- completely abstracts hardware and utilizes document structure
