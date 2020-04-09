@@ -286,7 +286,47 @@ S3 - stores images
 
 ## Setting up RDS
 
-- 
+- creates EC2 instance under the cover
+	- OS
+	- DB engine (e.g. PostgresSQL)
+- RDS Backups
+	- default: occurs daily
+	- Backups can be stored 1 - 35 days
+- Multi-AZ Deployment
+	- replicates DB in different availability zone
+	- automatic failover
+- Database Read Replica
+	- Non-production copy of database
+	- eventual consistency with source (won't impact production data)
+	- useful for running queries
+	- not a target for automatic failover
+- How to choose DB engine
+	- licensing cost
+	- familiarity
+	- quality of client software
+
+### Provision RDS with PSQL
+
+- RDS > create database `pizza-db-instance-a`
+	- PostgreSQL `11.5-R1`
+	- free tier template
+	- create and store master credentials
+	- db.t2.micro
+	- add to VPC `pizza-vpc`
+	- temporarily allow public access
+	- temporarily keep default VPC security group
+	- enable initial DB creation
+		- db name: `pizza_db_a_0`
+
+### Connect to RDS instance
+
+- Add inbound rule in RDS VPC
+	- `PostgreSQL - TCP - 5432 - My IP - <Your IP Address>`
+- Download client like pgAdmin or just install Postgres and use psql
+	- `psql -h <rds-endpoint> -d pizza_db_a_0 -U <db-username>`
+	- Hostname = endpoint
+- create `pizzas` table
+	- `psql -h $PSQL_HOST -d pizza_db_a_0 -U $PSQL_USER -f ./create_pizzas_table.sql`
 
 ## Setting up DynamoDB
 

@@ -40,6 +40,6 @@ The platform offers a security system with very fine grain access controls. Grou
 - S3 is a service that can be used to host any kind of static resource in the cloud. It offers practically unlimited storage capacity.
 - S3 is organized into buckets which is composed of objects (files).
 - Access can be controlled with bucket policies and/or IAM roles. 
-- Bucket objects can be accessed over HTTP by exposing the bucket's public IP.
+- Bucket objects can be accessed over HTTP by exposing the bucket's public IP. They also be accessed by other services in the same VPC via ARN or IP.
 - S3 is not suited for multi-region hosting compared to CloudFront as bucket replication is limited to 2 regions.
 - EC2 instances can be granted an IAM role that allows full access to bucket objects.
