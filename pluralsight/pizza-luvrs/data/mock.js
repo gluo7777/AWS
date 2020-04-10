@@ -16,9 +16,9 @@ module.exports.hydrate = () => {
   users.create('jim', 'pass', () => {})
   users.create('kathy', 'pass', () => {})
 
-  for (const pizza of mockPizzas) {
-    pizzas.batchImport(pizza.name, pizza.toppings, pizza.img, pizza.username)
-  }
+  // for (const pizza of mockPizzas) {
+  //   pizzas.batchImport(pizza.name, pizza.toppings, pizza.img, pizza.username)
+  // }
 
   // prep toppings
   toppings.init()

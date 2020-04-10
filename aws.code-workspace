@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "pluralsight"
+		},
+		{
+			"path": "pluralsight/pizza-luvrs"
 		}
 	],
 	"settings": {}

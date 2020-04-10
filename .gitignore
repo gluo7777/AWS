@@ -2,3 +2,5 @@ rootkey.csv
 credentials*.csv
 credentials.md
 *.pem
+.vscode
+.code-workspace

@@ -5,6 +5,6 @@ CREATE TABLE IF NOT EXISTS pizzas (
     ,img text
     ,username text
     ,created bigint
-    ,createdAt timestamptz
-    ,updatedAt timestamptz
+    ,"createdAt" timestamptz
+    ,"updatedAt" timestamptz
 );

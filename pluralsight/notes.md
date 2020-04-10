@@ -328,6 +328,19 @@ S3 - stores images
 - create `pizzas` table
 	- `psql -h $PSQL_HOST -d pizza_db_a_0 -U $PSQL_USER -f ./create_pizzas_table.sql`
 
+## Set up ORM in application
+
+- install node modules
+- create env file for db connection info
+- create a `pizzaStore.js` for interacting with DB
+	- Sequelize
+	- define schema
+-modify data/pizzas.js to store image in db
+	- convert array objects into JSON strings when inserting
+	- reverse conversion when retrieving
+- modify other functions to interact with DB
+- test with localhost
+
 ## Setting up DynamoDB
 
 - completely abstracts hardware and utilizes document structure
