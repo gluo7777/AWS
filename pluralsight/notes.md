@@ -341,6 +341,44 @@ S3 - stores images
 - modify other functions to interact with DB
 - test with localhost
 
-## Setting up DynamoDB
+## DynamoDB
 
 - completely abstracts hardware and utilizes document structure
+- structure
+	- table
+		- item
+			- primary key
+				- string, number, or binary
+		- provisioned throughput capacity
+			- 1 unit = 4 KB
+			- throttling occurs when exceeding PTC
+
+### Setting up DynamoDB
+
+- create DDB tables with string PK and default settings
+	- toppings
+	- users
+
+### Set up Application
+
+- create dynamoStore
+- configure AWS sdk
+- create DDB client
+- add async functions
+	- putItem
+	- getAllItems
+		- run a scan ( random order, 1 MB max throughput per transaction)
+	- getItem
+
+## RDS vs NOSQL
+
+- RDS: faster, structured, **structured** query language = strong query flexibility
+- DynamoDB: storage flexibility, difficult to query field thats not PK or secondary index
+
+## Add DB access for EC2 instances
+
+- Enhance pizza-ec2-role
+	- add AmazonRDSFullAccess
+	- add AmazonDynamoDBFullAccess
+- modify RDS security group to add pizza-ec2-sg
+- re-upload files and create new launch configuration
