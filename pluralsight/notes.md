@@ -381,4 +381,93 @@ S3 - stores images
 	- add AmazonRDSFullAccess
 	- add AmazonDynamoDBFullAccess
 - modify RDS security group to add pizza-ec2-sg
+- modify default VPC to create new postgresql rule for pizza-ec2-sg
 - re-upload files and create new launch configuration
+
+## Automate autoscaling and deployment
+
+- automated application deployment
+- infrastructure as code
+
+## Cloud Formation
+
+- allows easy replication of AWS resources to create multiple stacks (e.g. development, production)
+- JSON template 
+	- configuration of resources
+	- tracked in VC
+- stack
+	- unique name
+	- created from template
+	- can be updated/deleted
+		- deleting stack removes all the resources in stack
+- tooling
+	- CloudFormation Designer (GUI)
+		- create from scratch
+		- import template
+	- CloudFormer
+		- create template from existing infrastructure
+
+### Recreate existing pizza application infrastructure with CF
+
+**Failed to perform due to errors while creating certain resources**
+
+- `pizza-luvrs/cloudformation/pizza.template`
+	- update AMI ID in launcher `ami-06651e8ab7eb163a6`
+	- for simplicity, just use image without database changes
+	- update region
+	- update account id
+- launch CF wizard
+	- add template file
+	- `pizza-stack`
+- monitor stack events for completion
+- locate created lb and verify dns
+- recreate `pizza-stack`
+
+### (Optional: switch to CloudFormer)
+
+- Follow [instructions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-using-cloudformer.html) to create cloudformer stack
+- modify rds to use pizza-vpc
+- modify pizza-vpc ACL to allow postgres connections from EC2
+
+## Elastic Bean Stalk
+
+- provisions resources and runs application
+- EB Application (Logical)
+	- platform (e.g. NodeJS, Java)
+	- versions
+		- stored in S3
+	- environment
+		- AMI
+		- EC2 instances
+		- ASG
+		- deployed version
+- can deployed different versions in each environment (e.g. deploy test version -> production version)
+- creates a CF stack under the hood to automate this
+
+### Create new EBS Application
+
+- create application
+- create environment
+	- web server
+	- upload zip of source code to EBS (exclude root folder)
+	- select pizza-vpc
+	-  assign public IPs to each instance
+	- select both subnets
+	- modify instances
+		- assign ec2 security group
+	- add key pair
+	- modify capacity
+		- change env type to load balanced
+	- modify load balancer
+		- edit default process
+			- change port to 3000
+- monitor EBS console
+- update IAM Roles if not done already
+	- ec2 role
+		- RDS full access
+		- DDB full access
+		- S3 full access
+		- awselasticbeanstalkwebtier
+- confirm that rds instance inbound rules allow access from EC2 group
+- restart instances via EBS environment
+- access EBS url located in the breadcrumb
