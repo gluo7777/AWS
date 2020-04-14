@@ -431,7 +431,13 @@ S3 - stores images
 
 ## Elastic Bean Stalk
 
-- provisions resources and runs application
+- automates the following
+	- capacity provisioning
+	- load balancing
+	- instance scaling
+	- web app health monitoring
+		- aggregated metrics
+	- platform security updates
 - EB Application (Logical)
 	- platform (e.g. NodeJS, Java)
 	- versions
