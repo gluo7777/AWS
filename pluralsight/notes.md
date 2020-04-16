@@ -5,6 +5,7 @@
 > Follow below at **ALL** times
 
 - **TURN OFF** instances when not using
+- **SUSPEND** Autoscaler **Launch** Process to prevent autoscaler launch new instances
 - **DELETE** CloudFormation stacks before creating new one
 - Only work on **IAM USER**. **Avoid** using root aws account.
 - Do **NOT** add credentials/secrets/IPs/etc to version control.
