@@ -1,5 +1,21 @@
 # AWS Development
 
+## **IMPORTANT**
+
+> Follow below at **ALL** times
+
+- **TURN OFF** instances when not using
+- **DELETE** CloudFormation stacks before creating new one
+- Only work on **IAM USER**. **Avoid** using root aws account.
+- Do **NOT** add credentials/secrets/IPs/etc to version control.
+
+## PluralSight Tips
+
+- If you want to replay a certain part of the course but don't remember which module or time stamp
+	- Click on Transcript
+	- CTRL+F > `<text-to-match-on>`
+	- Click on matched text to open exact timestamp
+
 ## Developing in the cloud
 
 Industry shifting from on premise to cloud.
@@ -477,3 +493,121 @@ S3 - stores images
 - confirm that rds instance inbound rules allow access from EC2 group
 - restart instances via EBS environment
 - access EBS url located in the breadcrumb
+
+## Cloud Front
+
+- request/response latency: time it takes for client request to reach server and server response to reach client
+- addresses geographic latency
+- integrates with S3,EC2,load balancers
+- edges "objects" and serves them directly (e.g. CF will server content instead of S3)
+- CF Distribution
+	- domain
+	- origin
+		- object source
+	- distribution behaviors (e.g. TTL)
+- code agnostic
+- keep in mind that connections between CF and origins occur within AWS
+
+### Creating Distribution
+
+- Choose EBS application as origin (AWSEB)
+- (optional) add custom header to indicate that request came from CF
+- Viewer Protocol Policy > Redirect HTTP to HTTPS
+	- `this affects requests between client and server`
+- Customize Object Caching
+	- minimum TTL: 10 seconds
+	- white list forward cookies
+		- `AWSELB` cookies used by ELB for sticky sessions
+		- `pzz4lyfe`
+- Query String Forwarding and Caching
+	- `Forward all, cache based on all`
+- (optional) set up default root object (e.g. `index.html`)
+- (optional) turn on logging
+	- create S3 bucket for logging
+- ETA `10 mins`
+
+### Modify Distribution Settings
+
+- (optional) add additional origins
+- create behavior for pizza path (since this won't change)
+- path pattern `pizza/*`
+- Viewer Protocol Policy > Redirect HTTP to HTTPS
+- Customize Object Caching
+	- minimum TTL: something large (e.g. 2 hours)
+	- white list forward cookies
+	- `AWSELB`
+	- `pzz4lyfe`
+- ETA `10 mins`
+
+### Analysis
+
+- cache statistics
+	- hits: cache contained content so CF can serve directly
+	- misses: content was not cache so CF had to request from downstream
+- popular objects
+	- displays most requested endpoints
+		- then you can optimize those requests by creating distribution behaviors for those paths
+
+#### Verify CF
+
+- copy domain into address bar
+
+## ElastiCache
+
+- cache vs DB: cache is required when rapid data retrieval is needed (e.g. session data)
+- benefits
+	- managed maintenance and upgrades
+	- automatic read replicas
+	- simple node management
+	- same advantages as RDS
+- Cluster
+	- Node
+		- single cache instance running on EC2
+	- operates differently based on underlying caching engine
+		- Memcached
+		- Redis
+		- Redis has vastly superior scaling/featureset compared to MC
+
+### Security
+
+- create new sg `pizza-redis-sg`
+- inbound rule > allow access to `6379` from `pizza-ec2-sg`
+- modify `pizza-ec2-role`
+	- add elastic cache full access
+
+### Create Redis Cluster
+
+- (optional) enable cluster mode in production to configure multiple nodes
+- `pizza-cluster`
+- (optional) enable read-replica in production and increase number of replicas
+- node type > t2.micro
+- create new subnet group
+	- `pizza-cache-group`
+	- select pizza-vpc
+	- select pizza-redis-sg
+
+### Interacting with EC in Code
+
+- utilize underlying framework functionality (e.g. Spring Session, Hapi)
+
+#### Hapi
+
+- add cache in `Hapi.Server`
+	- name > `redis`
+	- provider
+		- constructor > require > `@hapi/catbox-redis`
+		- options
+			partition > `cache`
+			host > `<redis-primary-endpoint>`
+- `server.cache`
+	- cache > `redis`
+
+#### Redeploy with EBS
+
+- create app zip
+- navigate to EBS environment
+- upload and deploy
+	- enter version
+- verify EBS domain
+- test webapp
+	- (optional) use CF domain instead
