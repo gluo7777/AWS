@@ -17,7 +17,7 @@ function loadImages () {
   $.each(toppings, function (key, val) {
     const img = new window.Image()
     img.setAttribute('crossOrigin', 'anonymous')
-    img.src = '//unique-pizza-bucket.s3.us-east-2.amazonaws.com/toppings/' + val.image
+    img.src = '//process.env.S3HOST/toppings/' + val.image
     val.img = img
   })
 }

@@ -121,6 +121,7 @@ S3 - stores images
 - update repositories 
 	- `sudo su`
 	- `curl -sL https://rpm.nodesource.com/setup_12.x | bash -`
+- IP address CIDR guide: http://www.subnet-calculator.com/cidr.php
 
 ### Start app
 - install node

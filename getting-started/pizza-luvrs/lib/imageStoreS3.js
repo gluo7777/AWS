@@ -16,7 +16,7 @@ module.exports.save = (name, data) => {
                 reject(error)
             }else{
                 // TODO: replace with actual S3 location
-                resolve(`//unique-pizza-bucket.s3.us-east-2.amazonaws.com/${params.Key}`)
+                resolve(`//process.env.S3HOST/${params.Key}`)
             }
         })
     })

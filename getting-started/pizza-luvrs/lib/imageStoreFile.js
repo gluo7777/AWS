@@ -5,7 +5,7 @@ const util = require('util')
 const asyncWriteFile = util.promisify(fs.writeFile)
 
 module.exports.save = async (name, data, callback) => {
-  const fileName = `//unique-pizza-bucket.s3.us-east-2.amazonaws.com/pizzas/${name}.png`
+  const fileName = `//process.env.S3HOST/pizzas/${name}.png`
 
   try {
     await asyncWriteFile(path.join(__dirname, '/..', fileName), data, 'base64')

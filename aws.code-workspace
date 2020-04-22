@@ -8,6 +8,12 @@
 		},
 		{
 			"path": "pluralsight/pizza-luvrs"
+		},
+		{
+			"path": "../Apps/PizzaAppProduction"
+		},
+		{
+			"path": "designing-and-developing"
 		}
 	],
 	"settings": {}
